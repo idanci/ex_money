@@ -20,7 +20,7 @@ config :ex_money, ExMoney.Endpoint,
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 # Do not print debug messages in production
-config :logger, level: :info
+config :logger, level: :debug
 
 config :ex_money,
   saltedge_client_id: System.get_env("CLIENT_ID"),
