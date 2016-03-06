@@ -14,7 +14,7 @@ defmodule ExMoney.IdleWorker do
   end
 
   def handle_info(:keep_alive, state) do
-    HTTPoison.get!("https://#{System.get_env("HOME_URL")}")
+    HTTPoison.request(:get, "https://#{System.get_env("HOME_URL")}", "", [], [recv_timeout: 45000])
 
     Process.send_after(self, :keep_alive, @interval)
 
