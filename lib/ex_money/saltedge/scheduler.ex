@@ -14,17 +14,7 @@ defmodule ExMoney.Saltedge.Scheduler do
     {:ok, %{}}
   end
 
-  def handle_info(:schedule, %{workers_stopped: true} = state) do
-    Logger.info("Scheduler night cycle")
-
-    Process.send_after(self, :schedule, @interval)
-
-    {:noreply, state}
-  end
-
   def handle_info(:schedule, state) do
-    Logger.info("Scheduler cycle")
-
     case current_hour do
       hour when hour >= 0 and hour < 7 ->
         stop_worker(:login_refresh_worker)
@@ -32,13 +22,11 @@ defmodule ExMoney.Saltedge.Scheduler do
 
         Process.send_after(self, :start_worker, 7 * 60 * 60 * 1000)
         Logger.info("Workers have been scheduled to start in 7 hours")
-
-        Process.send_after(self, :schedule, @interval)
-        {:noreply, Map.put(state, :workers_stopped, true)}
       _ ->
         Process.send_after(self, :schedule, @interval)
-        {:noreply, state}
     end
+
+    {:noreply, state}
   end
 
   def handle_info(:start_worker, state) do
@@ -47,7 +35,7 @@ defmodule ExMoney.Saltedge.Scheduler do
 
     Process.send_after(self, :schedule, @interval)
 
-    {:noreply, Map.put(state, :workers_stopped, false)}
+    {:noreply, state}
   end
 
   defp start_worker(name, ref) do
